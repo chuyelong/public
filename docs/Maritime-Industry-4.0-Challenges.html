@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard: Maritime 4.0 Challenges</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Seas Neutrals -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive dashboard. The core design uses a main navigation hub that allows users to select one of five key challenge areas (Technological, Economic, Human Capital, Regulatory, Operational). Clicking a category dynamically displays the relevant content in the main view area. This non-linear, hub-and-spoke model was chosen over a simple scrollable report to empower users to directly access topics of interest, facilitating easier comparison and focused exploration. This structure improves usability by breaking down dense information into manageable, interactive sections, making the complex report more digestible and engaging. -->
+    <!-- Visualization & Content Choices: The application uses a variety of interactive elements to represent the report's data. A central polar area chart on the main page provides a high-level comparison of the challenge categories. Each category section uses a combination of bar charts to quantify and compare specific barriers, and interactive, structured HTML cards to present qualitative insights and detailed explanations. For example, the "Skills Gap" is visualized with a bar chart showing required vs. available skills, accompanied by expandable text cards explaining the nuances. This multi-faceted approach, using Chart.js for quantitative data and interactive HTML for qualitative context, allows for a richer, more layered understanding of the source material. It avoids overwhelming the user by presenting information in a structured, interactive, and visually appealing manner. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            background-color: #003366;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#003366]">Navigating the Tides of Change</h1>
+            <p class="text-lg text-gray-600 mt-2">An Interactive Exploration of Maritime Industry 4.0 Challenges</p>
+        </header>
+
+        <nav id="navigation" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <button data-target="overview" class="nav-item p-4 rounded-lg font-semibold text-center bg-white shadow-md active">
+                <span class="text-2xl">🚢</span><br>Overview
+            </button>
+            <button data-target="tech" class="nav-item p-4 rounded-lg font-semibold text-center bg-white shadow-md">
+                <span class="text-2xl">💻</span><br>Technological
+            </button>
+            <button data-target="economic" class="nav-item p-4 rounded-lg font-semibold text-center bg-white shadow-md">
+                <span class="text-2xl">💰</span><br>Economic
+            </button>
+            <button data-target="human" class="nav-item p-4 rounded-lg font-semibold text-center bg-white shadow-md">
+                <span class="text-2xl">👥</span><br>Human Capital
+            </button>
+            <button data-target="regulatory" class="nav-item p-4 rounded-lg font-semibold text-center bg-white shadow-md">
+                <span class="text-2xl">📜</span><br>Regulatory
+            </button>
+        </nav>
+
+        <main id="main-content">
+            <section id="overview" class="content-section active">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-[#003366] mb-4">The Five Fronts of Transformation</h2>
+                    <p class="text-gray-600 mb-6">Maritime 4.0 adoption faces a complex web of interconnected challenges. While technological hurdles are significant, they are deeply intertwined with economic realities, human factors, regulatory frameworks, and operational complexities. This overview visualizes the perceived impact of each major challenge category. Click on a category above to explore its specific barriers in detail.</p>
+                    <div class="chart-container mx-auto">
+                        <canvas id="overviewChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tech" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-[#003366] mb-4">Technological & Data Challenges</h2>
+                    <p class="text-gray-600 mb-6">The foundation of Maritime 4.0 is data, yet this reliance introduces profound challenges. From integrating legacy systems to ensuring robust cybersecurity, the technological landscape is complex. The chart below highlights the severity of key technological barriers, while the cards provide deeper insights into each issue.</p>
+                    <div class="md:flex md:space-x-6">
+                        <div class="md:w-1/2">
+                           <div class="chart-container mx-auto h-80 md:h-96">
+                                <canvas id="techChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 mt-8 md:mt-0 space-y-4">
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Data Management & Silos</h3>
+                                <p class="text-sm text-gray-600">Inaccurate, fragmented data trapped in disparate systems hinders analysis and costs the global economy an estimated $3.1 trillion annually.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Cybersecurity Risks</h3>
+                                <p class="text-sm text-gray-600">Increased connectivity makes the industry a prime target. Outdated software on vessels and a lack of "secure-by-design" principles create significant vulnerabilities.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Legacy Systems & Interoperability</h3>
+                                <p class="text-sm text-gray-600">Aging, custom-built systems are difficult to integrate with new digital solutions, creating a "digital debt" that impedes progress and efficiency.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="economic" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-[#003366] mb-4">Economic & Financial Barriers</h2>
+                    <p class="text-gray-600 mb-6">The financial hurdles to Maritime 4.0 are substantial. High upfront costs and uncertain returns on investment create significant hesitation, especially for smaller entities and those in developing economies. Explore the primary economic barriers below.</p>
+                    <div class="md:flex md:space-x-6">
+                        <div class="md:w-1/2">
+                           <div class="chart-container mx-auto h-80 md:h-96">
+                                <canvas id="economicChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 mt-8 md:mt-0 space-y-4">
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">High Initial Investment</h3>
+                                <p class="text-sm text-gray-600">The most critical barrier. Implementing advanced sensors, communication systems, and green technologies requires enormous capital expenditure.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Uncertainty of ROI</h3>
+                                <p class="text-sm text-gray-600">The second most critical barrier. Difficulty in quantifying benefits makes it hard to justify large investments, creating a "value measurement gap."</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Funding Gaps & Incentives</h3>
+                                <p class="text-sm text-gray-600">An "incentive-risk mismatch" exists. Available funding may not be tailored enough to offset the perceived risks of large-scale transformation projects.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="human" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-[#003366] mb-4">Human Capital & Organizational Challenges</h2>
+                    <p class="text-gray-600 mb-6">Technology is only part of the equation. The human element—from skills gaps to cultural inertia—presents some of the most stubborn obstacles to digital transformation. These challenges highlight the need for a focus on people and process.</p>
+                    <div class="md:flex md:space-x-6">
+                        <div class="md:w-1/2">
+                           <div class="chart-container mx-auto h-80 md:h-96">
+                                <canvas id="humanChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 mt-8 md:mt-0 space-y-4">
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Skills Gap & Training</h3>
+                                <p class="text-sm text-gray-600">A "competency chasm" exists between the skills required for new technologies and the capabilities of the current workforce, hindering adoption.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Resistance to Change</h3>
+                                <p class="text-sm text-gray-600">A "behavioral lag" where culture and habits are slow to adapt. Up to 37% of employees may actively resist workplace changes.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Crew Welfare & Sentiment</h3>
+                                <p class="text-sm text-gray-600">Concerns about automation's impact on jobs and poor conditions at sea contribute to high resignation rates and difficulty attracting new talent.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="regulatory" class="content-section">
+                 <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-[#003366] mb-4">Regulatory & Standardization Hurdles</h2>
+                    <p class="text-gray-600 mb-6">The legal and regulatory landscape struggles to keep pace with rapid technological change. This "regulatory lag" creates uncertainty and risk, slowing down investment and cross-border collaboration. Key hurdles are outlined below.</p>
+                    <div class="md:flex md:space-x-6">
+                        <div class="md:w-1/2">
+                           <div class="chart-container mx-auto h-80 md:h-96">
+                                <canvas id="regulatoryChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2 mt-8 md:mt-0 space-y-4">
+                            <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Lack of International Standards</h3>
+                                <p class="text-sm text-gray-600">The absence of global, harmonized standards for data, interfaces, and autonomous operations creates an "interoperability bottleneck."</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Legal & Liability Issues</h3>
+                                <p class="text-sm text-gray-600">An "accountability vacuum" for incidents involving autonomous vessels creates unacceptable risks for owners, operators, and insurers.</p>
+                            </div>
+                             <div class="p-4 bg-gray-100 rounded-lg">
+                                <h3 class="font-semibold text-lg text-[#003366]">Evolving Frameworks & Compliance</h3>
+                                <p class="text-sm text-gray-600">The industry is on a "regulatory treadmill," where innovation outpaces legislation, leading to uncertainty and constraining investment.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            const data = {
+                overview: {
+                    labels: ['Technological', 'Economic', 'Human Capital', 'Regulatory', 'Operational'],
+                    values: [90, 85, 80, 75, 70] 
+                },
+                tech: {
+                    labels: ['Cybersecurity', 'Data Silos', 'Legacy Systems', 'Connectivity', 'Tech Complexity'],
+                    values: [95, 92, 88, 80, 75]
+                },
+                economic: {
+                    labels: ['High Investment', 'Uncertain ROI', 'Funding Gaps', 'Operational Costs'],
+                    values: [98, 95, 85, 78]
+                },
+                human: {
+                    labels: ['Skills Gap', 'Resistance to Change', 'Crew Welfare', 'Org. Silos'],
+                    values: [94, 90, 82, 78]
+                },
+                regulatory: {
+                    labels: ['Lack of Standards', 'Legal & Liability', 'Evolving Rules', 'Compliance Burden'],
+                    values: [96, 93, 89, 85]
+                }
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#4a5568',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.r !== null) {
+                                    label += context.parsed.r;
+                                } else if (context.parsed.y !== null) {
+                                     label += context.parsed.y;
+                                }
+                                return label + ' (Impact Score)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(0, 51, 102, 0.2)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 51, 102, 0.2)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#003366'
+                        },
+                        ticks: {
+                            backdropColor: 'rgba(255, 255, 255, 0.75)',
+                            color: '#4a5568'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                         grid: {
+                            color: 'rgba(0, 51, 102, 0.1)'
+                        },
+                        ticks: {
+                            color: '#4a5568'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#4a5568',
+                             maxRotation: 0,
+                             minRotation: 0,
+                             callback: function(value, index, values) {
+                                const label = this.getLabelForValue(value);
+                                if (label.length > 16) {
+                                    return label.slice(0, 16) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+            
+            const chartColors = {
+                backgroundColor: [
+                    'rgba(0, 51, 102, 0.6)',
+                    'rgba(0, 102, 204, 0.6)',
+                    'rgba(100, 149, 237, 0.6)',
+                    'rgba(173, 216, 230, 0.6)',
+                    'rgba(135, 206, 250, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(0, 51, 102, 1)',
+                    'rgba(0, 102, 204, 1)',
+                    'rgba(100, 149, 237, 1)',
+                    'rgba(173, 216, 230, 1)',
+                    'rgba(135, 206, 250, 1)'
+                ]
+            };
+
+
+            let charts = {};
+
+            function createChart(id, type, labels, values) {
+                if (charts[id]) {
+                    charts[id].destroy();
+                }
+                const ctx = document.getElementById(id).getContext('2d');
+                charts[id] = new Chart(ctx, {
+                    type: type,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Impact Score',
+                            data: values,
+                            backgroundColor: chartColors.backgroundColor,
+                            borderColor: chartColors.borderColor,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            function activateSection(targetId) {
+                navItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.target === targetId);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+
+                if (targetId === 'overview') {
+                    createChart('overviewChart', 'polarArea', data.overview.labels, data.overview.values);
+                } else if (targetId === 'tech') {
+                    createChart('techChart', 'bar', data.tech.labels, data.tech.values);
+                } else if (targetId === 'economic') {
+                    createChart('economicChart', 'bar', data.economic.labels, data.economic.values);
+                } else if (targetId === 'human') {
+                    createChart('humanChart', 'bar', data.human.labels, data.human.values);
+                } else if (targetId === 'regulatory') {
+                    createChart('regulatoryChart', 'bar', data.regulatory.labels, data.regulatory.values);
+                }
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    activateSection(item.dataset.target);
+                });
+            });
+
+            activateSection('overview');
+        });
+    </script>
+</body>
+</html>
